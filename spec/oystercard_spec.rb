@@ -15,4 +15,8 @@ describe Oystercard do
     fail_message = "cannot top-up, #{oystercard.balance + 100} is greater than limit of #{Oystercard::MAXIMUM_BALANCE}"
     expect { oystercard.top_up 100 }.to raise_error fail_message
   end
+
+  it 'checks if the money has been deducted from the card' do
+    expect { oystercard.deduct 2 }.to change { oystercard.balance }.by -2
+  end
 end
