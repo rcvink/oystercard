@@ -3,6 +3,7 @@ require 'oystercard'
 describe Oystercard do
   subject(:oystercard) { described_class.new }
   let(:entry_station) { double :entry_station }
+  let(:exit_station) { double :exit_station }
 
   describe 'initially' do
     it 'has a initial balance of 0' do
@@ -11,6 +12,10 @@ describe Oystercard do
 
     it 'is not in a journey' do
       expect(oystercard.in_journey?).to be false
+    end
+
+    it 'has no history' do
+      expect(oystercard.history).to be_empty
     end
   end
 
@@ -37,33 +42,26 @@ describe Oystercard do
         expect{ oystercard.touch_in(entry_station) }.to raise_error 'Not enough money on your card'
       end
     end
-
-    it 'records entry station name' do
-      oystercard.top_up(2)
-      oystercard.touch_in(entry_station)
-      expect(oystercard.entry_station).to eq entry_station
-    end
   end
 
   describe '#touch_out' do
-    it 'touches out successfully' do
+    before(:each) do
       oystercard.top_up(2)
       oystercard.touch_in(entry_station)
-      oystercard.touch_out
+    end
+
+    it 'touches out successfully' do
+      oystercard.touch_out(exit_station)
       expect(oystercard).not_to be_in_journey
     end
 
     it 'deducts the fare from my balance' do
-      oystercard.top_up(10)
-      oystercard.touch_in(entry_station)
-      expect { oystercard.touch_out }.to change { oystercard.balance }.by -1
+      expect { oystercard.touch_out(exit_station) }.to change { oystercard.balance }.by -1
     end
 
-    it 'sets entry station to nil on touch out' do
-      oystercard.top_up(10)
-      oystercard.touch_in(entry_station)
-      oystercard.touch_out
-      expect(oystercard.entry_station).to eq nil
+    it 'stores the journey when touching out' do
+      oystercard.touch_out(exit_station)
+      expect(oystercard.history).to include(origin: entry_station, destination: exit_station)
     end
   end
 end
