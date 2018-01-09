@@ -13,20 +13,17 @@ class Oystercard
 
   def top_up(amount)
     fail_message = "cannot top-up, #{@balance + amount} is greater than limit of #{MAXIMUM_BALANCE}"
-    raise fail_message if @balance + amount > MAXIMUM_BALANCE
+    raise fail_message if limit_exceeded?(amount)
     @balance += amount
   end
 
-  def deduct(amount)
-    @balance -= amount
-  end
-
   def touch_in
-    raise 'Not enough money on your card' if @balance < MINIMUM_FARE
+    raise 'Not enough money on your card' if insufficient_funds?
     @in_journey = true
   end
 
   def touch_out
+    deduct(MINIMUM_FARE)
     @in_journey = false
   end
 
@@ -34,4 +31,16 @@ class Oystercard
     @in_journey
   end
 
+  private
+  def limit_exceeded?(amount)
+    @balance + amount > MAXIMUM_BALANCE
+  end
+
+  def deduct(amount)
+    @balance -= amount
+  end
+
+  def insufficient_funds?
+    @balance < MINIMUM_FARE
+  end
 end
