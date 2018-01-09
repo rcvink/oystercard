@@ -47,7 +47,7 @@ class Oystercard
   end
 
   def store_entry_station(entry_station)
-    @current_journey = { origin: entry_station, destination: nil }
+    @current_journey = {origin: entry_station}
   end
 
   def store_exit_station(exit_station)
