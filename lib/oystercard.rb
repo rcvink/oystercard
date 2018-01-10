@@ -20,12 +20,15 @@ class Oystercard
 
   def touch_in(entry_station)
     raise 'Not enough money on your card' if insufficient_funds?
-    store_entry_station(entry_station)
+    # store_entry_station(entry_station)
+    @journey = Journey.new
+    @journey.start(entry_station)
   end
 
   def touch_out(exit_station)
     deduct(MINIMUM_FARE)
     store_exit_station(exit_station)
+    @journey.finish(exit_station)
   end
 
   def in_journey?
@@ -33,7 +36,6 @@ class Oystercard
   end
 
   private
-
   def limit_exceeded?(amount)
     @balance + amount > MAXIMUM_BALANCE
   end
